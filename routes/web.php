@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProjectController::class, 'landing'])->name('landing');
+Route::get('/portfolio', [ProjectController::class, 'allProjects'])->name('portfolio.all');
 
 // Admin Login Routes
 Route::prefix('admin')->middleware('guest')->group(function () {

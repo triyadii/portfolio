@@ -13,8 +13,18 @@ class ProjectController extends Controller
      */
     public function landing()
     {
-        $projects = Project::latest()->get();
+        // Tampilkan 6 project terbaru di halaman utama
+        $projects = Project::latest()->take(6)->get();
         return view('index', compact('projects'));
+    }
+
+    /**
+     * Display all projects (public), latest input first.
+     */
+    public function allProjects()
+    {
+        $projects = Project::latest()->get();
+        return view('portfolio', compact('projects'));
     }
 
     /**

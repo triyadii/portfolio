@@ -252,6 +252,14 @@
                     @endforelse
                 </div>
 
+                @if ($projects->count() >= 6)
+                    <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="300">
+                        <a href="{{ route('portfolio.all') }}" class="btn btn-primary">
+                            Lihat Keseluruhan <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                @endif
+
             </div>
 
         </section><!-- /Portfolio Section -->
