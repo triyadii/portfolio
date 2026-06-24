@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
         // Seed admin user
         $this->call(AdminUserSeeder::class);
 
+        // Seed Sample Jasa
+        $this->call(JasaSeeder::class);
+
         // Seed Sample Projects
         Project::create([
             'namaProject' => 'E-Commerce Marketplace',

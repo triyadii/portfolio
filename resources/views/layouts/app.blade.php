@@ -47,9 +47,15 @@
         <!-- Header -->
         <div id="kt_header" class="header bg-white shadow-sm mb-5">
             <div class="container-fluid d-flex justify-content-between align-items-center px-4 py-3">
-                <h1 class="h4 mb-0">
-                    <a href="{{ route('landing') }}" class="text-decoration-none text-dark">Portfolio Admin</a>
-                </h1>
+                <div class="d-flex align-items-center gap-4">
+                    <h1 class="h4 mb-0">
+                        <a href="{{ route('landing') }}" class="text-decoration-none text-dark">Portfolio Admin</a>
+                    </h1>
+                    <nav class="d-flex align-items-center gap-2">
+                        <a href="{{ route('projects.index') }}" class="btn btn-sm {{ request()->routeIs('projects.*') ? 'btn-primary' : 'btn-outline-primary' }}">Project</a>
+                        <a href="{{ route('jasa.index') }}" class="btn btn-sm {{ request()->routeIs('jasa.*') ? 'btn-primary' : 'btn-outline-primary' }}">Jasa</a>
+                    </nav>
+                </div>
                 <div class="d-flex align-items-center gap-3">
                     <span class="text-muted">{{ Auth::user()->name ?? 'Admin' }}</span>
                     <form action="{{ route('admin.logout') }}" method="POST" style="display: inline;">

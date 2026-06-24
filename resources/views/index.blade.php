@@ -265,4 +265,135 @@
         </section><!-- /Portfolio Section -->
     </main>
 
+    {{-- Chat Widget --}}
+    <style>
+        .chat-toggle {
+            position: fixed; bottom: 24px; right: 24px;
+            padding: 14px 22px; border-radius: 30px;
+            background: #4f46e5; color: #fff; border: none;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0,0,0,.25);
+            z-index: 1000;
+        }
+        .chat-window {
+            position: fixed; bottom: 96px; right: 24px;
+            width: 370px; max-width: calc(100vw - 32px);
+            height: 520px; max-height: calc(100vh - 200px);
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,.2);
+            display: none; flex-direction: column; overflow: hidden;
+            z-index: 1000;
+        }
+        .chat-window.open { display: flex; }
+        .chat-header {
+            background: #4f46e5; color: #fff; padding: 16px;
+            font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+        }
+        .chat-header small { font-weight: 400; opacity: .8; display: block; }
+        .chat-close { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
+        .chat-messages {
+            flex: 1; padding: 16px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .chat-messages .msg { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+        .chat-messages .msg.user { align-self: flex-end; background: #4f46e5; color: #fff; border-bottom-right-radius: 4px; }
+        .chat-messages .msg.bot { align-self: flex-start; background: #f3f4f6; color: #111; border-bottom-left-radius: 4px; }
+        .chat-messages .typing { align-self: flex-start; color: #888; font-size: 13px; font-style: italic; }
+        .chat-input {
+            display: flex; padding: 12px; border-top: 1px solid #eee; gap: 8px;
+        }
+        .chat-input input {
+            flex: 1; padding: 10px 14px; border: 1px solid #ddd;
+            border-radius: 24px; outline: none; font-size: 14px;
+        }
+        .chat-input input:focus { border-color: #4f46e5; }
+        .chat-input button {
+            background: #4f46e5; color: #fff; border: none;
+            width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 18px;
+        }
+        .chat-input button:disabled { opacity: .5; cursor: not-allowed; }
+    </style>
+
+    <button class="chat-toggle" onclick="toggleChat()"><i class="bi bi-chat-dots-fill me-2"></i>Chat Asisten Dii</button>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div>
+                Asisten Dii
+            </div>
+            <button class="chat-close" onclick="toggleChat()">×</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="msg bot">Halo! Ada yang bisa saya bantu? 👋</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Ketik pesan..." onkeydown="if(event.key==='Enter')sendMessage()">
+            <button id="sendBtn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const messagesEl = document.getElementById('chatMessages');
+        const inputEl = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        let history = []; // simpan riwayat untuk konteks
+
+        function toggleChat() {
+            document.getElementById('chatWindow').classList.toggle('open');
+        }
+
+        function addMessage(text, sender) {
+            const div = document.createElement('div');
+            div.className = 'msg ' + sender;
+            div.textContent = text;
+            messagesEl.appendChild(div);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = inputEl.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'user');
+            history.push({ role: 'user', content: text });
+            inputEl.value = '';
+            sendBtn.disabled = true;
+
+            // Indikator mengetik
+            const typing = document.createElement('div');
+            typing.className = 'typing';
+            typing.textContent = 'AI sedang mengetik...';
+            messagesEl.appendChild(typing);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+
+            try {
+                const res = await fetch("{{ route('chat.send') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        message: text,
+                        history: history.slice(-10), // batasi konteks 10 pesan terakhir
+                    }),
+                });
+
+                const data = await res.json();
+                typing.remove();
+
+                const reply = data.reply || 'Maaf, terjadi kesalahan.';
+                addMessage(reply, 'bot');
+                history.push({ role: 'assistant', content: reply });
+            } catch (e) {
+                typing.remove();
+                addMessage('Gagal terhubung ke server.', 'bot');
+            } finally {
+                sendBtn.disabled = false;
+                inputEl.focus();
+            }
+        }
+    </script>
+
     @include('layouts.footer')

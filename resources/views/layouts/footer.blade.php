@@ -23,8 +23,8 @@
 
 </footer>
 
-<!-- Scroll Top -->
-<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+<!-- Scroll Top (disembunyikan, dipertahankan agar main.js tidak error) -->
+<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center" style="display: none !important;"><i
         class="bi bi-arrow-up-short"></i></a>
 
 <!-- Preloader -->
