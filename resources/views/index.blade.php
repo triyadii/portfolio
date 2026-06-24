@@ -295,7 +295,7 @@
             flex: 1; padding: 16px; overflow-y: auto;
             display: flex; flex-direction: column; gap: 12px;
         }
-        .chat-messages .msg { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+        .chat-messages .msg { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-wrap: break-word; white-space: pre-wrap; }
         .chat-messages .msg.user { align-self: flex-end; background: #4f46e5; color: #fff; border-bottom-right-radius: 4px; }
         .chat-messages .msg.bot { align-self: flex-start; background: #f3f4f6; color: #111; border-bottom-left-radius: 4px; }
         .chat-messages .typing { align-self: flex-start; color: #888; font-size: 13px; font-style: italic; }
@@ -351,6 +351,27 @@
             messagesEl.scrollTop = messagesEl.scrollHeight;
         }
 
+        // Tampilkan balasan bot secara bertahap (efek mengetik), per kata
+        function typeBotMessage(text) {
+            return new Promise((resolve) => {
+                const div = document.createElement('div');
+                div.className = 'msg bot';
+                messagesEl.appendChild(div);
+
+                const words = text.split(' ');
+                let i = 0;
+                const interval = setInterval(() => {
+                    div.textContent += (i === 0 ? '' : ' ') + words[i];
+                    i++;
+                    messagesEl.scrollTop = messagesEl.scrollHeight;
+                    if (i >= words.length) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 180); // jeda antar kata (ms)
+            });
+        }
+
         async function sendMessage() {
             const text = inputEl.value.trim();
             if (!text) return;
@@ -384,8 +405,8 @@
                 typing.remove();
 
                 const reply = data.reply || 'Maaf, terjadi kesalahan.';
-                addMessage(reply, 'bot');
                 history.push({ role: 'assistant', content: reply });
+                await typeBotMessage(reply);
             } catch (e) {
                 typing.remove();
                 addMessage('Gagal terhubung ke server.', 'bot');

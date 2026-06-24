@@ -57,7 +57,11 @@ class ChatController extends Controller
             . "Jawab dalam Bahasa Indonesia dengan ramah, jelas, dan sopan. "
             . "Jawab HANYA berdasarkan DATA JASA dan DATA PROJECT di bawah ini. "
             . "Jika client menanyakan harga atau jasa yang tidak ada dalam data, jangan mengarang; "
-            . "arahkan mereka untuk menghubungi langsung via WhatsApp (wa.me/6282275849670) atau email (m.dicotriyadi@gmail.com).\n\n";
+            . "arahkan mereka untuk menghubungi langsung via WhatsApp (wa.me/6282275849670) atau email (m.dicotriyadi@gmail.com).\n"
+            . "FORMAT JAWABAN: Jika menjawab beberapa hal (misal daftar jasa, fitur, atau apa saja yang didapat), "
+            . "tampilkan sebagai DAFTAR dengan setiap poin pada baris baru diawali tanda \"- \" (strip dan spasi). "
+            . "Jangan menggabungkan banyak poin ke dalam satu paragraf. "
+            . "Gunakan teks biasa saja, jangan pakai format markdown seperti ** atau ##.\n\n";
 
         // Data jasa
         $jasa = Jasa::orderBy('harga')->get();
